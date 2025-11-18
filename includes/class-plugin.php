@@ -71,6 +71,24 @@ class AISCG_Plugin {
         // 图片生成器
         require_once AISCG_PLUGIN_DIR . 'includes/class-image-generator.php';
 
+        // 批量处理器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-batch-processor.php';
+
+        // 定时任务调度器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-scheduler.php';
+
+        // 内容导出器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-exporter.php';
+
+        // 统计分析
+        require_once AISCG_PLUGIN_DIR . 'includes/class-analytics.php';
+
+        // 短代码
+        require_once AISCG_PLUGIN_DIR . 'includes/class-shortcodes.php';
+
+        // Widget
+        require_once AISCG_PLUGIN_DIR . 'includes/class-widget.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
@@ -112,14 +130,19 @@ class AISCG_Plugin {
 
         // 添加插件设置链接
         add_filter( 'plugin_action_links_' . AISCG_PLUGIN_BASENAME, array( $admin, 'add_action_links' ) );
+
+        // 初始化定时调度器
+        $scheduler = new AISCG_Scheduler();
     }
 
     /**
      * 定义公共端的钩子
      */
     private function define_public_hooks() {
-        // 目前公共端没有特别的钩子
-        // 可以在这里添加短代码或公共端的功能
+        // 初始化短代码
+        $shortcodes = new AISCG_Shortcodes();
+
+        // Widget已在class-widget.php中通过hooks自动注册
     }
 
     /**

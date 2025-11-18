@@ -227,6 +227,47 @@ class AISCG_Admin {
             'callback' => array( $this, 'rest_download_images' ),
             'permission_callback' => array( $this, 'rest_permission_check' ),
         ) );
+
+        // 批量生成
+        register_rest_route( 'aiscg/v1', '/batch-generate', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_batch_generate' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 导出内容
+        register_rest_route( 'aiscg/v1', '/export', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_export_content' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 获取统计信息
+        register_rest_route( 'aiscg/v1', '/statistics', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_statistics' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 获取趋势数据
+        register_rest_route( 'aiscg/v1', '/statistics/trend', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_trend_data' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 定时任务管理
+        register_rest_route( 'aiscg/v1', '/scheduler', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_scheduler_status' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        register_rest_route( 'aiscg/v1', '/scheduler', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_update_scheduler' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
     }
 
     /**
@@ -504,6 +545,138 @@ class AISCG_Admin {
         readfile( $zip_filename );
         unlink( $zip_filename );
         exit;
+    }
+
+    /**
+     * REST API: 批量生成
+     */
+    public function rest_batch_generate( $request ) {
+        $params = $request->get_json_params();
+
+        $topics = isset( $params['topics'] ) ? $params['topics'] : array();
+        $options = isset( $params['options'] ) ? $params['options'] : array();
+
+        if ( empty( $topics ) ) {
+            return new WP_Error( 'missing_topics', __( 'Topics are required', 'ai-social-content-generator' ), array( 'status' => 400 ) );
+        }
+
+        try {
+            $batch_processor = new AISCG_Batch_Processor();
+            $results = $batch_processor->start_batch( $topics, $options );
+
+            return rest_ensure_response( $results );
+        } catch ( Exception $e ) {
+            return new WP_Error( 'batch_failed', $e->getMessage(), array( 'status' => 500 ) );
+        }
+    }
+
+    /**
+     * REST API: 导出内容
+     */
+    public function rest_export_content( $request ) {
+        $params = $request->get_json_params();
+
+        $post_ids = isset( $params['post_ids'] ) ? $params['post_ids'] : array();
+        $format = isset( $params['format'] ) ? sanitize_text_field( $params['format'] ) : 'json';
+
+        try {
+            $exporter = new AISCG_Content_Exporter();
+
+            if ( ! empty( $post_ids ) ) {
+                $filepath = $exporter->export_multiple( $post_ids, $format );
+            } else {
+                $filters = isset( $params['filters'] ) ? $params['filters'] : array();
+                $filepath = $exporter->export_all( $filters, $format );
+            }
+
+            $upload = wp_upload_dir();
+            $file_url = str_replace( $upload['basedir'], $upload['baseurl'], $filepath );
+
+            return rest_ensure_response( array(
+                'success' => true,
+                'file_url' => $file_url,
+                'filename' => basename( $filepath ),
+            ) );
+        } catch ( Exception $e ) {
+            return new WP_Error( 'export_failed', $e->getMessage(), array( 'status' => 500 ) );
+        }
+    }
+
+    /**
+     * REST API: 获取统计信息
+     */
+    public function rest_get_statistics( $request ) {
+        $analytics = new AISCG_Analytics();
+
+        $stats = array(
+            'overview' => $analytics->get_overview_stats(),
+            'ai_model_usage' => $analytics->get_ai_model_usage(),
+            'content_quality' => $analytics->get_content_quality_metrics(),
+            'productivity' => $analytics->get_productivity_stats(),
+            'storage' => $analytics->get_storage_stats(),
+        );
+
+        return rest_ensure_response( $stats );
+    }
+
+    /**
+     * REST API: 获取趋势数据
+     */
+    public function rest_get_trend_data( $request ) {
+        $days = $request->get_param( 'days' );
+        $days = $days ? absint( $days ) : 30;
+
+        $analytics = new AISCG_Analytics();
+        $trend_data = $analytics->get_trend_data( $days );
+
+        return rest_ensure_response( $trend_data );
+    }
+
+    /**
+     * REST API: 获取调度器状态
+     */
+    public function rest_get_scheduler_status( $request ) {
+        $scheduler = new AISCG_Scheduler();
+        $status = $scheduler->get_status();
+        $logs = $scheduler->get_scheduler_logs( 10 );
+
+        return rest_ensure_response( array(
+            'status' => $status,
+            'logs' => $logs,
+        ) );
+    }
+
+    /**
+     * REST API: 更新调度器
+     */
+    public function rest_update_scheduler( $request ) {
+        $params = $request->get_json_params();
+        $action = isset( $params['action'] ) ? sanitize_text_field( $params['action'] ) : '';
+
+        $scheduler = new AISCG_Scheduler();
+
+        try {
+            if ( $action === 'enable' ) {
+                $config = isset( $params['config'] ) ? $params['config'] : array();
+                $result = $scheduler->enable_scheduled_generation( $config );
+
+                return rest_ensure_response( array(
+                    'success' => $result,
+                    'message' => __( 'Scheduler enabled', 'ai-social-content-generator' ),
+                ) );
+            } elseif ( $action === 'disable' ) {
+                $scheduler->disable_scheduled_generation();
+
+                return rest_ensure_response( array(
+                    'success' => true,
+                    'message' => __( 'Scheduler disabled', 'ai-social-content-generator' ),
+                ) );
+            } else {
+                return new WP_Error( 'invalid_action', __( 'Invalid action', 'ai-social-content-generator' ), array( 'status' => 400 ) );
+            }
+        } catch ( Exception $e ) {
+            return new WP_Error( 'scheduler_error', $e->getMessage(), array( 'status' => 500 ) );
+        }
     }
 
     /**

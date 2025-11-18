@@ -151,6 +151,18 @@ class AISCG_Image_Generator {
             case 'minimal':
                 $this->draw_minimal_background( $image, $width, $height );
                 break;
+            case 'modern':
+                $this->draw_modern_background( $image, $width, $height );
+                break;
+            case 'dark':
+                $this->draw_dark_background( $image, $width, $height );
+                break;
+            case 'colorful':
+                $this->draw_colorful_background( $image, $width, $height );
+                break;
+            case 'elegant':
+                $this->draw_elegant_background( $image, $width, $height );
+                break;
             default:
                 $this->draw_gradient_background( $image, $width, $height );
         }
@@ -399,6 +411,119 @@ class AISCG_Image_Generator {
         }
 
         return $parts;
+    }
+
+    /**
+     * 绘制现代风格背景
+     *
+     * @param resource $image  图片资源
+     * @param int      $width  宽度
+     * @param int      $height 高度
+     */
+    private function draw_modern_background( $image, $width, $height ) {
+        // 双色渐变(青色到蓝色)
+        for ( $i = 0; $i < $height; $i++ ) {
+            $r = 64 + ( $i / $height ) * ( 25 - 64 );
+            $g = 224 + ( $i / $height ) * ( 118 - 224 );
+            $b = 208 + ( $i / $height ) * ( 210 - 208 );
+
+            $color = imagecolorallocate( $image, $r, $g, $b );
+            imagefilledrectangle( $image, 0, $i, $width, $i + 1, $color );
+        }
+
+        // 添加几何图形装饰
+        $circle_color = imagecolorallocatealpha( $image, 255, 255, 255, 100 );
+        imagefilledellipse( $image, $width * 0.8, $height * 0.2, 200, 200, $circle_color );
+        imagefilledellipse( $image, $width * 0.2, $height * 0.8, 150, 150, $circle_color );
+    }
+
+    /**
+     * 绘制深色背景
+     *
+     * @param resource $image  图片资源
+     * @param int      $width  宽度
+     * @param int      $height 高度
+     */
+    private function draw_dark_background( $image, $width, $height ) {
+        // 深色渐变(深灰到黑)
+        for ( $i = 0; $i < $height; $i++ ) {
+            $value = 50 - ( $i / $height ) * 30;
+            $color = imagecolorallocate( $image, $value, $value, $value );
+            imagefilledrectangle( $image, 0, $i, $width, $i + 1, $color );
+        }
+
+        // 添加光效
+        $glow_color = imagecolorallocatealpha( $image, 100, 100, 255, 90 );
+        imagefilledellipse( $image, $width / 2, $height / 2, $width * 0.6, $height * 0.6, $glow_color );
+    }
+
+    /**
+     * 绘制彩色背景
+     *
+     * @param resource $image  图片资源
+     * @param int      $width  宽度
+     * @param int      $height 高度
+     */
+    private function draw_colorful_background( $image, $width, $height ) {
+        // 多彩渐变(橙色到粉色到紫色)
+        for ( $i = 0; $i < $height; $i++ ) {
+            $progress = $i / $height;
+
+            if ( $progress < 0.5 ) {
+                // 橙色到粉色
+                $t = $progress * 2;
+                $r = 255;
+                $g = 127 + $t * ( 192 - 127 );
+                $b = 80 + $t * ( 203 - 80 );
+            } else {
+                // 粉色到紫色
+                $t = ( $progress - 0.5 ) * 2;
+                $r = 255 - $t * ( 255 - 147 );
+                $g = 192 - $t * ( 192 - 112 );
+                $b = 203 - $t * ( 203 - 219 );
+            }
+
+            $color = imagecolorallocate( $image, $r, $g, $b );
+            imagefilledrectangle( $image, 0, $i, $width, $i + 1, $color );
+        }
+    }
+
+    /**
+     * 绘制优雅背景
+     *
+     * @param resource $image  图片资源
+     * @param int      $width  宽度
+     * @param int      $height 高度
+     */
+    private function draw_elegant_background( $image, $width, $height ) {
+        // 米白色背景
+        $bg_color = imagecolorallocate( $image, 250, 248, 245 );
+        imagefilledrectangle( $image, 0, 0, $width, $height, $bg_color );
+
+        // 添加边框
+        $border_color = imagecolorallocate( $image, 212, 175, 55 );
+        $border_width = 20;
+        imagefilledrectangle( $image, 0, 0, $width, $border_width, $border_color );
+        imagefilledrectangle( $image, 0, $height - $border_width, $width, $height, $border_color );
+        imagefilledrectangle( $image, 0, 0, $border_width, $height, $border_color );
+        imagefilledrectangle( $image, $width - $border_width, 0, $width, $height, $border_color );
+    }
+
+    /**
+     * 获取所有可用的模板
+     *
+     * @return array 模板列表
+     */
+    public static function get_available_templates() {
+        return array(
+            'gradient' => __( 'Gradient (Purple to Pink)', 'ai-social-content-generator' ),
+            'solid' => __( 'Solid Color (Light Blue)', 'ai-social-content-generator' ),
+            'minimal' => __( 'Minimal (White)', 'ai-social-content-generator' ),
+            'modern' => __( 'Modern (Cyan to Blue)', 'ai-social-content-generator' ),
+            'dark' => __( 'Dark (Deep Gray)', 'ai-social-content-generator' ),
+            'colorful' => __( 'Colorful (Orange to Purple)', 'ai-social-content-generator' ),
+            'elegant' => __( 'Elegant (Cream with Gold Border)', 'ai-social-content-generator' ),
+        );
     }
 
     /**
