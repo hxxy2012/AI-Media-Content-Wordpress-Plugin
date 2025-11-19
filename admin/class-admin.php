@@ -268,6 +268,76 @@ class AISCG_Admin {
             'callback' => array( $this, 'rest_update_scheduler' ),
             'permission_callback' => array( $this, 'rest_permission_check' ),
         ) );
+
+        // 竞品分析 - 添加竞品
+        register_rest_route( 'aiscg/v1', '/competitors', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_add_competitor' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 竞品分析 - 获取竞品列表
+        register_rest_route( 'aiscg/v1', '/competitors', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_competitors' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 竞品分析 - 分析竞品
+        register_rest_route( 'aiscg/v1', '/competitors/(?P<id>\d+)/analyze', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_analyze_competitor' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 合规检查 - 检查内容
+        register_rest_route( 'aiscg/v1', '/compliance/check', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_check_compliance' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 合规检查 - 获取检查历史
+        register_rest_route( 'aiscg/v1', '/compliance/history/(?P<content_id>\d+)', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_compliance_history' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 聊天机器人 - 发送消息
+        register_rest_route( 'aiscg/v1', '/chatbot/message', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_chatbot_message' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 聊天机器人 - 获取会话列表
+        register_rest_route( 'aiscg/v1', '/chatbot/sessions', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_chatbot_sessions' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 聊天机器人 - 获取会话详情
+        register_rest_route( 'aiscg/v1', '/chatbot/sessions/(?P<session_id>[a-zA-Z0-9_]+)', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_chatbot_session' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 聊天机器人 - 结束会话
+        register_rest_route( 'aiscg/v1', '/chatbot/sessions/(?P<session_id>[a-zA-Z0-9_]+)/end', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_end_chatbot_session' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 聊天机器人 - 获取统计
+        register_rest_route( 'aiscg/v1', '/chatbot/stats', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'rest_get_chatbot_stats' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
     }
 
     /**
@@ -677,6 +747,180 @@ class AISCG_Admin {
         } catch ( Exception $e ) {
             return new WP_Error( 'scheduler_error', $e->getMessage(), array( 'status' => 500 ) );
         }
+    }
+
+    /**
+     * REST API: 添加竞品
+     */
+    public function rest_add_competitor( $request ) {
+        $analyzer = new AISCG_Competitor_Analyzer();
+
+        $data = array(
+            'name' => sanitize_text_field( $request->get_param( 'name' ) ),
+            'platform' => sanitize_text_field( $request->get_param( 'platform' ) ),
+            'account_id' => sanitize_text_field( $request->get_param( 'account_id' ) ),
+            'description' => sanitize_textarea_field( $request->get_param( 'description' ) ),
+            'category' => sanitize_text_field( $request->get_param( 'category' ) ),
+        );
+
+        $competitor_id = $analyzer->add_competitor( $data );
+
+        if ( $competitor_id ) {
+            return rest_ensure_response( array(
+                'success' => true,
+                'competitor_id' => $competitor_id,
+            ) );
+        }
+
+        return new WP_Error( 'add_failed', '添加竞品失败', array( 'status' => 500 ) );
+    }
+
+    /**
+     * REST API: 获取竞品列表
+     */
+    public function rest_get_competitors( $request ) {
+        $analyzer = new AISCG_Competitor_Analyzer();
+        $competitors = $analyzer->get_competitors();
+
+        return rest_ensure_response( $competitors );
+    }
+
+    /**
+     * REST API: 分析竞品
+     */
+    public function rest_analyze_competitor( $request ) {
+        $id = intval( $request->get_param( 'id' ) );
+        $options = array(
+            'sample_size' => intval( $request->get_param( 'sample_size' ) ) ?: 50,
+            'use_ai' => $request->get_param( 'use_ai' ) !== 'false',
+        );
+
+        $analyzer = new AISCG_Competitor_Analyzer();
+        $analysis = $analyzer->analyze_competitor( $id, $options );
+
+        if ( is_wp_error( $analysis ) ) {
+            return new WP_Error( $analysis->get_error_code(), $analysis->get_error_message(), array( 'status' => 404 ) );
+        }
+
+        return rest_ensure_response( $analysis );
+    }
+
+    /**
+     * REST API: 合规检查
+     */
+    public function rest_check_compliance( $request ) {
+        $content_id = intval( $request->get_param( 'content_id' ) );
+        $content = $request->get_param( 'content' );
+
+        $options = array(
+            'checks' => $request->get_param( 'checks' ) ?: array( 'legal', 'copyright', 'advertising', 'platform_policy' ),
+            'use_ai' => $request->get_param( 'use_ai' ) !== 'false',
+            'strict_mode' => $request->get_param( 'strict_mode' ) === 'true',
+        );
+
+        $checker = new AISCG_Compliance_Checker();
+
+        // 如果传了content_id就检查ID，否则检查传入的内容
+        $result = $checker->check_compliance( $content_id ?: $content, $options );
+
+        return rest_ensure_response( $result );
+    }
+
+    /**
+     * REST API: 获取合规检查历史
+     */
+    public function rest_get_compliance_history( $request ) {
+        $content_id = intval( $request->get_param( 'content_id' ) );
+
+        $checker = new AISCG_Compliance_Checker();
+        $history = $checker->get_compliance_history( $content_id );
+
+        return rest_ensure_response( $history );
+    }
+
+    /**
+     * REST API: 聊天机器人发送消息
+     */
+    public function rest_chatbot_message( $request ) {
+        $message = sanitize_textarea_field( $request->get_param( 'message' ) );
+        $session_id = sanitize_text_field( $request->get_param( 'session_id' ) );
+        $bot_type = sanitize_text_field( $request->get_param( 'bot_type' ) ) ?: 'content_assistant';
+
+        $options = array(
+            'bot_type' => $bot_type,
+        );
+
+        if ( $session_id ) {
+            $options['session_id'] = $session_id;
+        }
+
+        $chatbot = new AISCG_Chatbot();
+        $result = $chatbot->send_message( $message, $options );
+
+        return rest_ensure_response( $result );
+    }
+
+    /**
+     * REST API: 获取聊天机器人会话列表
+     */
+    public function rest_get_chatbot_sessions( $request ) {
+        $user_id = get_current_user_id();
+        $status = sanitize_text_field( $request->get_param( 'status' ) );
+        $limit = intval( $request->get_param( 'limit' ) ) ?: 20;
+
+        $args = array(
+            'status' => $status,
+            'limit' => $limit,
+        );
+
+        $chatbot = new AISCG_Chatbot();
+        $sessions = $chatbot->get_user_sessions( $user_id, $args );
+
+        return rest_ensure_response( $sessions );
+    }
+
+    /**
+     * REST API: 获取聊天机器人会话详情
+     */
+    public function rest_get_chatbot_session( $request ) {
+        $session_id = sanitize_text_field( $request->get_param( 'session_id' ) );
+
+        $chatbot = new AISCG_Chatbot();
+        $session = $chatbot->get_session_details( $session_id );
+
+        if ( ! $session ) {
+            return new WP_Error( 'session_not_found', '会话不存在', array( 'status' => 404 ) );
+        }
+
+        return rest_ensure_response( $session );
+    }
+
+    /**
+     * REST API: 结束聊天机器人会话
+     */
+    public function rest_end_chatbot_session( $request ) {
+        $session_id = sanitize_text_field( $request->get_param( 'session_id' ) );
+
+        $chatbot = new AISCG_Chatbot();
+        $result = $chatbot->end_session( $session_id );
+
+        if ( $result ) {
+            return rest_ensure_response( array( 'success' => true ) );
+        }
+
+        return new WP_Error( 'end_session_failed', '结束会话失败', array( 'status' => 500 ) );
+    }
+
+    /**
+     * REST API: 获取聊天机器人统计
+     */
+    public function rest_get_chatbot_stats( $request ) {
+        $user_id = intval( $request->get_param( 'user_id' ) ) ?: get_current_user_id();
+
+        $chatbot = new AISCG_Chatbot();
+        $stats = $chatbot->get_usage_stats( $user_id );
+
+        return rest_ensure_response( $stats );
     }
 
     /**
