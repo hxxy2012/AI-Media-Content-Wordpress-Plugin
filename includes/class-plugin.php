@@ -161,6 +161,15 @@ class AISCG_Plugin {
         // 智能写作助手
         require_once AISCG_PLUGIN_DIR . 'includes/class-writing-assistant.php';
 
+        // 关键词研究工具
+        require_once AISCG_PLUGIN_DIR . 'includes/class-keyword-researcher.php';
+
+        // 备份管理器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-backup-manager.php';
+
+        // 工作流自动化引擎
+        require_once AISCG_PLUGIN_DIR . 'includes/class-workflow-engine.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
