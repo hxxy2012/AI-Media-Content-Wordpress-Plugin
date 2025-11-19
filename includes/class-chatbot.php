@@ -389,19 +389,39 @@ class AISCG_Chatbot {
         );
         $args = wp_parse_args( $args, $defaults );
 
-        $where = $wpdb->prepare( "user_id = %d", $user_id );
+        // 确保数值类型
+        $user_id = intval( $user_id );
+        $limit = intval( $args['limit'] );
+        $offset = intval( $args['offset'] );
 
         if ( $args['status'] ) {
-            $where .= $wpdb->prepare( " AND status = %s", $args['status'] );
+            $sessions = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM $table_sessions
+                    WHERE user_id = %d AND status = %s
+                    ORDER BY updated_at DESC
+                    LIMIT %d OFFSET %d",
+                    $user_id,
+                    $args['status'],
+                    $limit,
+                    $offset
+                ),
+                ARRAY_A
+            );
+        } else {
+            $sessions = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM $table_sessions
+                    WHERE user_id = %d
+                    ORDER BY updated_at DESC
+                    LIMIT %d OFFSET %d",
+                    $user_id,
+                    $limit,
+                    $offset
+                ),
+                ARRAY_A
+            );
         }
-
-        $sessions = $wpdb->get_results(
-            "SELECT * FROM $table_sessions
-            WHERE {$where}
-            ORDER BY updated_at DESC
-            LIMIT {$args['limit']} OFFSET {$args['offset']}",
-            ARRAY_A
-        );
 
         return $sessions;
     }
@@ -479,18 +499,30 @@ class AISCG_Chatbot {
         $table_sessions = $wpdb->prefix . 'aiscg_chatbot_sessions';
         $table_messages = $wpdb->prefix . 'aiscg_chatbot_messages';
 
-        $where = $user_id ? $wpdb->prepare( "WHERE user_id = %d", $user_id ) : "";
+        $stats = array();
 
-        $stats = array(
-            'total_sessions' => $wpdb->get_var( "SELECT COUNT(*) FROM $table_sessions {$where}" ),
-            'active_sessions' => $wpdb->get_var( "SELECT COUNT(*) FROM $table_sessions {$where} AND status = 'active'" ),
-            'total_messages' => $wpdb->get_var(
-                "SELECT COUNT(*) FROM $table_messages
-                WHERE session_id IN (SELECT session_id FROM $table_sessions {$where})"
-            ),
-            'avg_messages_per_session' => 0,
-        );
+        if ( $user_id ) {
+            $user_id = intval( $user_id );
+            $stats['total_sessions'] = $wpdb->get_var(
+                $wpdb->prepare( "SELECT COUNT(*) FROM $table_sessions WHERE user_id = %d", $user_id )
+            );
+            $stats['active_sessions'] = $wpdb->get_var(
+                $wpdb->prepare( "SELECT COUNT(*) FROM $table_sessions WHERE user_id = %d AND status = 'active'", $user_id )
+            );
+            $stats['total_messages'] = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM $table_messages
+                    WHERE session_id IN (SELECT session_id FROM $table_sessions WHERE user_id = %d)",
+                    $user_id
+                )
+            );
+        } else {
+            $stats['total_sessions'] = $wpdb->get_var( "SELECT COUNT(*) FROM $table_sessions" );
+            $stats['active_sessions'] = $wpdb->get_var( "SELECT COUNT(*) FROM $table_sessions WHERE status = 'active'" );
+            $stats['total_messages'] = $wpdb->get_var( "SELECT COUNT(*) FROM $table_messages" );
+        }
 
+        $stats['avg_messages_per_session'] = 0;
         if ( $stats['total_sessions'] > 0 ) {
             $stats['avg_messages_per_session'] = round( $stats['total_messages'] / $stats['total_sessions'], 2 );
         }
