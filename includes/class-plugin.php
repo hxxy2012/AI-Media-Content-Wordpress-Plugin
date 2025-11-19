@@ -155,6 +155,12 @@ class AISCG_Plugin {
         // A/B测试管理器
         require_once AISCG_PLUGIN_DIR . 'includes/class-ab-test-manager.php';
 
+        // 质量检测器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-quality-detector.php';
+
+        // 智能写作助手
+        require_once AISCG_PLUGIN_DIR . 'includes/class-writing-assistant.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
