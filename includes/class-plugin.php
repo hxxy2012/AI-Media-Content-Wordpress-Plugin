@@ -110,6 +110,21 @@ class AISCG_Plugin {
         // 设置管理器
         require_once AISCG_PLUGIN_DIR . 'includes/class-settings-manager.php';
 
+        // 内容质量评分
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-scorer.php';
+
+        // 内容优化器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-optimizer.php';
+
+        // 多语言生成器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-multilingual-generator.php';
+
+        // 素材库
+        require_once AISCG_PLUGIN_DIR . 'includes/class-media-library.php';
+
+        // 发布计划
+        require_once AISCG_PLUGIN_DIR . 'includes/class-publishing-planner.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';

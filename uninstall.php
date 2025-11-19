@@ -28,6 +28,8 @@ function aiscg_delete_database_tables() {
         $wpdb->prefix . 'aiscg_rate_limits',
         $wpdb->prefix . 'aiscg_cache',
         $wpdb->prefix . 'aiscg_notifications',
+        $wpdb->prefix . 'aiscg_media_library',
+        $wpdb->prefix . 'aiscg_publishing_plans',
     );
 
     foreach ( $tables as $table ) {

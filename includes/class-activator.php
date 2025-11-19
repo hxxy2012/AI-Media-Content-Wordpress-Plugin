@@ -194,6 +194,49 @@ class AISCG_Activator {
             KEY created_at (created_at)
         ) $charset_collate;";
 
+        // 素材库表
+        $table_media_library = $wpdb->prefix . 'aiscg_media_library';
+        $sql_media_library = "CREATE TABLE IF NOT EXISTS $table_media_library (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            type varchar(50) NOT NULL,
+            title varchar(200) NOT NULL,
+            content longtext,
+            category varchar(50),
+            platform varchar(20),
+            language varchar(10),
+            tags longtext,
+            metadata longtext,
+            usage_count int DEFAULT 0,
+            user_id bigint(20),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY type (type),
+            KEY category (category),
+            KEY platform (platform),
+            KEY usage_count (usage_count)
+        ) $charset_collate;";
+
+        // 发布计划表
+        $table_publishing_plans = $wpdb->prefix . 'aiscg_publishing_plans';
+        $sql_publishing_plans = "CREATE TABLE IF NOT EXISTS $table_publishing_plans (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            post_id bigint(20) NOT NULL,
+            platform varchar(20),
+            scheduled_time datetime,
+            timezone varchar(50),
+            status varchar(20) DEFAULT 'pending',
+            auto_publish tinyint(1) DEFAULT 0,
+            notify_on_publish tinyint(1) DEFAULT 0,
+            published_at datetime,
+            metadata longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY post_id (post_id),
+            KEY status (status),
+            KEY scheduled_time (scheduled_time)
+        ) $charset_collate;";
+
         // 执行SQL
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $sql_posts );
@@ -205,6 +248,8 @@ class AISCG_Activator {
         dbDelta( $sql_rate_limits );
         dbDelta( $sql_cache );
         dbDelta( $sql_notifications );
+        dbDelta( $sql_media_library );
+        dbDelta( $sql_publishing_plans );
 
         // 记录日志
         error_log( 'AISCG: Database tables created successfully' );
