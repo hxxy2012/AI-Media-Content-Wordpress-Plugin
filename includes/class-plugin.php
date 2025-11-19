@@ -125,6 +125,21 @@ class AISCG_Plugin {
         // 发布计划
         require_once AISCG_PLUGIN_DIR . 'includes/class-publishing-planner.php';
 
+        // 趋势分析器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-trend-analyzer.php';
+
+        // SEO优化器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-seo-optimizer.php';
+
+        // 协作系统
+        require_once AISCG_PLUGIN_DIR . 'includes/class-collaboration-system.php';
+
+        // 高级报表
+        require_once AISCG_PLUGIN_DIR . 'includes/class-advanced-reports.php';
+
+        // 性能监控
+        require_once AISCG_PLUGIN_DIR . 'includes/class-performance-monitor.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
