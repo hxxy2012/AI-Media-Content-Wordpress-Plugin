@@ -140,6 +140,21 @@ class AISCG_Plugin {
         // 性能监控
         require_once AISCG_PLUGIN_DIR . 'includes/class-performance-monitor.php';
 
+        // 智能推荐引擎
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-recommender.php';
+
+        // AI标签生成器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-ai-tag-generator.php';
+
+        // 成本追踪器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-cost-tracker.php';
+
+        // 内容分类器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-classifier.php';
+
+        // A/B测试管理器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-ab-test-manager.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
