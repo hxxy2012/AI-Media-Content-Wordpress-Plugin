@@ -179,6 +179,15 @@ class AISCG_Plugin {
         // 智能内容日历
         require_once AISCG_PLUGIN_DIR . 'includes/class-content-calendar.php';
 
+        // 竞品内容分析器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-competitor-analyzer.php';
+
+        // 内容合规检查器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-compliance-checker.php';
+
+        // 智能问答机器人
+        require_once AISCG_PLUGIN_DIR . 'includes/class-chatbot.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
