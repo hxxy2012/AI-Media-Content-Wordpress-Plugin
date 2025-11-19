@@ -170,6 +170,15 @@ class AISCG_Plugin {
         // 工作流自动化引擎
         require_once AISCG_PLUGIN_DIR . 'includes/class-workflow-engine.php';
 
+        // 社交媒体分发系统
+        require_once AISCG_PLUGIN_DIR . 'includes/class-social-distributor.php';
+
+        // 内容表现分析器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-performance-analyzer.php';
+
+        // 智能内容日历
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-calendar.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
