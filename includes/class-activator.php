@@ -94,11 +94,117 @@ class AISCG_Activator {
             UNIQUE KEY setting_key (setting_key)
         ) $charset_collate;";
 
+        // 日志表
+        $table_logs = $wpdb->prefix . 'aiscg_logs';
+        $sql_logs = "CREATE TABLE IF NOT EXISTS $table_logs (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            level varchar(20) NOT NULL,
+            message text,
+            context longtext,
+            user_id bigint(20),
+            ip_address varchar(45),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY level (level),
+            KEY user_id (user_id),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+
+        // 模板表
+        $table_templates = $wpdb->prefix . 'aiscg_templates';
+        $sql_templates = "CREATE TABLE IF NOT EXISTS $table_templates (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            name varchar(200) NOT NULL,
+            description text,
+            platform varchar(20),
+            content longtext,
+            variables longtext,
+            category varchar(50),
+            is_active tinyint(1) DEFAULT 1,
+            user_id bigint(20),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY platform (platform),
+            KEY category (category),
+            KEY user_id (user_id)
+        ) $charset_collate;";
+
+        // 版本控制表
+        $table_versions = $wpdb->prefix . 'aiscg_versions';
+        $sql_versions = "CREATE TABLE IF NOT EXISTS $table_versions (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            post_id bigint(20) NOT NULL,
+            title text,
+            content text,
+            hashtags text,
+            platform varchar(20),
+            ai_model varchar(50),
+            images longtext,
+            metadata longtext,
+            changes longtext,
+            user_id bigint(20),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY post_id (post_id),
+            KEY user_id (user_id),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+
+        // 速率限制表
+        $table_rate_limits = $wpdb->prefix . 'aiscg_rate_limits';
+        $sql_rate_limits = "CREATE TABLE IF NOT EXISTS $table_rate_limits (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            service varchar(50) NOT NULL,
+            metadata longtext,
+            user_id bigint(20),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY service (service),
+            KEY user_id (user_id),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+
+        // 缓存表
+        $table_cache = $wpdb->prefix . 'aiscg_cache';
+        $sql_cache = "CREATE TABLE IF NOT EXISTS $table_cache (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            cache_key varchar(255) NOT NULL,
+            cache_value longtext,
+            expires_at datetime,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            UNIQUE KEY cache_key (cache_key),
+            KEY expires_at (expires_at)
+        ) $charset_collate;";
+
+        // 通知表
+        $table_notifications = $wpdb->prefix . 'aiscg_notifications';
+        $sql_notifications = "CREATE TABLE IF NOT EXISTS $table_notifications (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            type varchar(20) NOT NULL,
+            recipient text,
+            success tinyint(1),
+            metadata longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY type (type),
+            KEY success (success),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+
         // 执行SQL
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $sql_posts );
         dbDelta( $sql_images );
         dbDelta( $sql_settings );
+        dbDelta( $sql_logs );
+        dbDelta( $sql_templates );
+        dbDelta( $sql_versions );
+        dbDelta( $sql_rate_limits );
+        dbDelta( $sql_cache );
+        dbDelta( $sql_notifications );
 
         // 记录日志
         error_log( 'AISCG: Database tables created successfully' );

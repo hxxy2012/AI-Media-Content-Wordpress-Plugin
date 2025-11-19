@@ -22,6 +22,12 @@ function aiscg_delete_database_tables() {
         $wpdb->prefix . 'aiscg_posts',
         $wpdb->prefix . 'aiscg_images',
         $wpdb->prefix . 'aiscg_settings',
+        $wpdb->prefix . 'aiscg_logs',
+        $wpdb->prefix . 'aiscg_templates',
+        $wpdb->prefix . 'aiscg_versions',
+        $wpdb->prefix . 'aiscg_rate_limits',
+        $wpdb->prefix . 'aiscg_cache',
+        $wpdb->prefix . 'aiscg_notifications',
     );
 
     foreach ( $tables as $table ) {
@@ -46,6 +52,15 @@ function aiscg_delete_options() {
         'aiscg_scheduler_logs',
         'aiscg_batch_queue',
         'aiscg_content_retention_days',
+        'aiscg_batch_config',
+        'aiscg_export_config',
+        'aiscg_analytics_config',
+        'aiscg_logger_settings',
+        'aiscg_cache_enabled',
+        'aiscg_rate_limits',
+        'aiscg_webhooks',
+        'aiscg_email_notifications',
+        'aiscg_keep_data_on_uninstall',
     );
 
     foreach ( $options as $option ) {
@@ -63,6 +78,12 @@ function aiscg_delete_uploaded_files() {
     $content_dir = $upload_dir['basedir'] . '/aiscg-content';
     if ( is_dir( $content_dir ) ) {
         aiscg_delete_directory( $content_dir );
+    }
+
+    // 删除图片目录
+    $images_dir = $upload_dir['basedir'] . '/aiscg-images';
+    if ( is_dir( $images_dir ) ) {
+        aiscg_delete_directory( $images_dir );
     }
 
     // 删除导出目录

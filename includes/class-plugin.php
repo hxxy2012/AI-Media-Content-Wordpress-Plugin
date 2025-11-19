@@ -89,6 +89,27 @@ class AISCG_Plugin {
         // Widget
         require_once AISCG_PLUGIN_DIR . 'includes/class-widget.php';
 
+        // 日志系统
+        require_once AISCG_PLUGIN_DIR . 'includes/class-logger.php';
+
+        // 模板管理器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-template-manager.php';
+
+        // 版本控制
+        require_once AISCG_PLUGIN_DIR . 'includes/class-version-control.php';
+
+        // 图片定制器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-image-customizer.php';
+
+        // API管理器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-api-manager.php';
+
+        // 通知系统
+        require_once AISCG_PLUGIN_DIR . 'includes/class-notification.php';
+
+        // 设置管理器
+        require_once AISCG_PLUGIN_DIR . 'includes/class-settings-manager.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';

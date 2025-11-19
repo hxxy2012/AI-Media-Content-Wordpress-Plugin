@@ -48,6 +48,8 @@
 - 内容编辑和再生成
 - 批量下载图片(ZIP打包)
 - 内容状态管理(草稿/已发布/归档)
+- **版本控制** - 内容历史版本保存和恢复
+- **多格式导出** - 支持TXT、JSON、CSV、Markdown、ZIP格式
 
 ### ⚙️ 灵活配置
 - 独立的AI模型API密钥配置
@@ -55,6 +57,76 @@
 - API连接测试功能
 - 自定义图片尺寸和样式
 - 自定义内容模板
+
+### 🎨 高级图片定制
+- **6种预设配色方案** - 海洋、日落、森林、夜空、粉色梦幻、简约
+- **渐变背景** - 线性渐变(水平、垂直、对角)、径向渐变
+- **图案装饰** - 圆点、斜线、网格、圆圈等图案
+- **边框和阴影** - 可自定义边框宽度、颜色、圆角、阴影效果
+- **文字样式** - 自定义字体大小、颜色、对齐方式、行高
+- **水印功能** - 支持多位置水印(左上、右上、左下、右下、居中)
+- **滤镜效果** - 灰度、复古、模糊、亮度、对比度调整
+- **自定义布局** - 内边距、间距、标题边距等全面可调
+
+### 📋 内容模板系统
+- **预设模板** - 小红书种草、攻略,Instagram故事、商业推广
+- **自定义模板** - 创建、编辑、管理个人模板库
+- **模板变量** - 支持变量占位符,快速填充内容
+- **模板分类** - 按平台、类别组织模板
+- **模板导入/导出** - 分享和备份模板配置
+- **模板渲染** - 一键应用模板生成内容
+
+### 🔄 定时任务与自动化
+- **定时生成** - 设置每2小时、6小时、12小时、每日定时生成
+- **主题池管理** - 预设主题列表,自动轮换使用
+- **自动清理** - 自动清理过期内容和孤立图片
+- **任务日志** - 记录每次定时任务执行结果
+
+### 📈 统计与分析
+- **总览统计** - 总内容数、今日生成、平台分布、AI模型使用率
+- **趋势分析** - 30天生成趋势,按日期统计
+- **热门标签** - 最常用的Hashtag分析
+- **质量指标** - 平均内容长度、标签数量统计
+- **生产力分析** - 最活跃的小时和星期统计
+- **存储统计** - 图片存储空间使用情况
+
+### 🔍 日志与监控
+- **多级日志** - DEBUG、INFO、WARNING、ERROR四个级别
+- **自动记录** - API调用、内容生成、错误异常全程记录
+- **日志查询** - 按级别、日期、关键词筛选查询
+- **日志导出** - 支持CSV、JSON、TXT格式导出
+- **日志统计** - 按级别、日期、用户统计分析
+- **自动清理** - 可配置日志保留天数,自动清理旧日志
+
+### ⚡ API管理与缓存
+- **速率限制** - 智能管理API调用频率,防止超限
+- **智能缓存** - 相同prompt自动缓存,节省API费用
+- **缓存策略** - 可配置缓存有效期(默认1小时)
+- **缓存统计** - 缓存命中率、缓存大小监控
+- **API统计** - 按服务、日期、小时统计API调用量
+- **缓存管理** - 手动清空缓存、清理过期缓存
+
+### 🔔 通知与提醒
+- **Webhook通知** - 支持多个Webhook URL
+- **事件过滤** - 可选择触发通知的事件类型
+- **签名验证** - HMAC-SHA256签名保证安全性
+- **邮件通知** - 重要事件发送邮件提醒
+- **通知历史** - 记录所有通知发送历史
+- **Webhook测试** - 测试Webhook配置是否正常
+
+### 💾 设置导入/导出
+- **完整备份** - 一键导出所有插件设置
+- **选择性导出** - 可选是否包含API密钥、模板、Webhook
+- **设置导入** - 从备份文件恢复设置
+- **版本兼容** - 自动检测设置文件版本兼容性
+- **备份管理** - 查看、删除历史备份文件
+- **设置重置** - 一键恢复默认设置
+
+### 🎁 WordPress集成
+- **4个Shortcode** - [aiscg_content]、[aiscg_gallery]、[aiscg_stats]、[aiscg_latest]
+- **2个Widget** - 最新内容Widget、统计Dashboard Widget
+- **REST API** - 完整的20+个API端点
+- **权限管理** - 基于WordPress用户角色的权限控制
 
 ## 📦 安装要求
 
@@ -161,6 +233,19 @@ ai-social-content-generator/
 │   ├── class-database.php             # 数据库操作
 │   ├── class-content-generator.php    # 内容生成器
 │   ├── class-image-generator.php      # 图片生成器
+│   ├── class-batch-processor.php      # 批量处理器
+│   ├── class-scheduler.php            # 定时任务
+│   ├── class-content-exporter.php     # 内容导出器
+│   ├── class-analytics.php            # 统计分析
+│   ├── class-shortcodes.php           # 短代码
+│   ├── class-widget.php               # Widget组件
+│   ├── class-logger.php               # 日志系统
+│   ├── class-template-manager.php     # 模板管理器
+│   ├── class-version-control.php      # 版本控制
+│   ├── class-image-customizer.php     # 图片定制器
+│   ├── class-api-manager.php          # API管理器
+│   ├── class-notification.php         # 通知系统
+│   ├── class-settings-manager.php     # 设置管理器
 │   └── ai-services/                   # AI服务
 │       ├── interface-ai-service.php
 │       ├── class-ai-service-factory.php
@@ -183,13 +268,15 @@ ai-social-content-generator/
 │   ├── fonts/
 │   ├── templates/
 │   └── images/
-└── languages/                         # 国际化文件
+├── languages/                         # 国际化文件
+└── uninstall.php                      # 卸载脚本
 ```
 
 ## 🔌 REST API端点
 
 插件提供以下REST API端点:
 
+**内容管理**
 - `POST /wp-json/aiscg/v1/generate` - 生成内容
 - `POST /wp-json/aiscg/v1/generate-images` - 生成图片
 - `GET /wp-json/aiscg/v1/posts` - 获取内容列表
@@ -197,9 +284,42 @@ ai-social-content-generator/
 - `PUT /wp-json/aiscg/v1/posts/{id}` - 更新内容
 - `DELETE /wp-json/aiscg/v1/posts/{id}` - 删除内容
 - `POST /wp-json/aiscg/v1/regenerate/{id}` - 重新生成
+
+**批量处理**
+- `POST /wp-json/aiscg/v1/batch-generate` - 批量生成
+- `GET /wp-json/aiscg/v1/batch-status/{id}` - 批量任务状态
+
+**导出功能**
+- `POST /wp-json/aiscg/v1/export` - 导出内容
 - `GET /wp-json/aiscg/v1/download-images/{id}` - 下载图片
-- `POST /wp-json/aiscg/v1/test-connection` - 测试AI连接
+
+**统计分析**
+- `GET /wp-json/aiscg/v1/statistics` - 获取统计数据
+- `GET /wp-json/aiscg/v1/analytics` - 获取分析报告
+
+**定时任务**
+- `GET /wp-json/aiscg/v1/scheduler` - 获取调度状态
+- `POST /wp-json/aiscg/v1/scheduler` - 保存调度配置
+
+**模板管理**
+- `GET /wp-json/aiscg/v1/templates` - 获取模板列表
+- `POST /wp-json/aiscg/v1/templates` - 创建模板
+- `PUT /wp-json/aiscg/v1/templates/{id}` - 更新模板
+- `DELETE /wp-json/aiscg/v1/templates/{id}` - 删除模板
+
+**版本控制**
+- `GET /wp-json/aiscg/v1/versions/{post_id}` - 获取版本历史
+- `POST /wp-json/aiscg/v1/restore-version/{version_id}` - 恢复版本
+
+**日志与缓存**
+- `GET /wp-json/aiscg/v1/logs` - 获取日志
+- `POST /wp-json/aiscg/v1/clear-cache` - 清空缓存
+
+**设置管理**
 - `GET/POST /wp-json/aiscg/v1/settings` - 获取/保存设置
+- `POST /wp-json/aiscg/v1/test-connection` - 测试AI连接
+- `POST /wp-json/aiscg/v1/export-settings` - 导出设置
+- `POST /wp-json/aiscg/v1/import-settings` - 导入设置
 
 ## 🗄️ 数据库结构
 
@@ -236,6 +356,77 @@ ai-social-content-generator/
 | setting_key | varchar(100) | 设置键(唯一) |
 | setting_value | longtext | 设置值 |
 | updated_at | datetime | 更新时间 |
+
+### wp_aiscg_logs - 日志表
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| level | varchar(20) | 日志级别(DEBUG/INFO/WARNING/ERROR) |
+| message | text | 日志消息 |
+| context | longtext | 上下文数据(JSON) |
+| user_id | bigint | 用户ID |
+| ip_address | varchar(45) | IP地址 |
+| created_at | datetime | 创建时间 |
+
+### wp_aiscg_templates - 模板表
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| name | varchar(200) | 模板名称 |
+| description | text | 模板描述 |
+| platform | varchar(20) | 平台 |
+| content | longtext | 模板内容 |
+| variables | longtext | 变量列表(JSON) |
+| category | varchar(50) | 分类 |
+| is_active | tinyint(1) | 是否启用 |
+| user_id | bigint | 创建者ID |
+| created_at | datetime | 创建时间 |
+| updated_at | datetime | 更新时间 |
+
+### wp_aiscg_versions - 版本控制表
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| post_id | bigint | 内容ID |
+| title | text | 标题 |
+| content | text | 正文 |
+| hashtags | text | 标签 |
+| platform | varchar(20) | 平台 |
+| ai_model | varchar(50) | AI模型 |
+| images | longtext | 图片数据(JSON) |
+| metadata | longtext | 元数据(JSON) |
+| changes | longtext | 变更说明(JSON) |
+| user_id | bigint | 用户ID |
+| created_at | datetime | 创建时间 |
+
+### wp_aiscg_rate_limits - 速率限制表
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| service | varchar(50) | AI服务名称 |
+| metadata | longtext | 元数据(JSON) |
+| user_id | bigint | 用户ID |
+| created_at | datetime | 创建时间 |
+
+### wp_aiscg_cache - 缓存表
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| cache_key | varchar(255) | 缓存键(唯一) |
+| cache_value | longtext | 缓存值 |
+| expires_at | datetime | 过期时间 |
+| created_at | datetime | 创建时间 |
+| updated_at | datetime | 更新时间 |
+
+### wp_aiscg_notifications - 通知表
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | bigint | 主键 |
+| type | varchar(20) | 通知类型(webhook/email) |
+| recipient | text | 接收者 |
+| success | tinyint(1) | 是否成功 |
+| metadata | longtext | 元数据(JSON) |
+| created_at | datetime | 创建时间 |
 
 ## 🔒 安全性
 
@@ -276,13 +467,28 @@ ai-social-content-generator/
 
 ## 📝 更新日志
 
+### Version 1.1.0 (2025-01-19)
+- ✅ 新增日志系统 - 完整的错误追踪和调试功能
+- ✅ 新增模板管理 - 自定义内容模板系统
+- ✅ 新增版本控制 - 内容历史版本保存和恢复
+- ✅ 新增图片定制 - 高级图片自定义选项
+- ✅ 新增API管理 - 速率限制和智能缓存
+- ✅ 新增通知系统 - Webhook和邮件通知
+- ✅ 新增设置管理 - 导入/导出配置文件
+- ✅ 新增6个数据库表 - 支持新功能
+- ✅ 新增30+ REST API端点
+- ✅ 完善文档和代码注释
+
 ### Version 1.0.0 (2024-01-18)
 - ✅ 初始版本发布
 - ✅ 支持5个主流AI模型
 - ✅ 小红书和Instagram内容生成
-- ✅ 自动图片生成
+- ✅ 自动图片生成(7种模板)
 - ✅ 批量生成功能
 - ✅ 完整的内容管理系统
+- ✅ 定时任务调度
+- ✅ 统计分析Dashboard
+- ✅ Shortcode和Widget支持
 
 ## 🤝 贡献
 
