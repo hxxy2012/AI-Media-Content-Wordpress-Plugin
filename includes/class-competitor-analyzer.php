@@ -53,7 +53,6 @@ class AISCG_Competitor_Analyzer {
     public function __construct() {
         $this->database = new AISCG_Database();
         $this->ai_factory = new AISCG_AI_Service_Factory();
-        $this->create_competitors_table();
     }
 
     /**

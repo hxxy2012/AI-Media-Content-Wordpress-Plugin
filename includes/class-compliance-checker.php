@@ -73,7 +73,6 @@ class AISCG_Compliance_Checker {
      */
     public function __construct() {
         $this->ai_factory = new AISCG_AI_Service_Factory();
-        $this->create_compliance_table();
     }
 
     /**

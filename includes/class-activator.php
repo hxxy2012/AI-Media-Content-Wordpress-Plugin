@@ -237,6 +237,161 @@ class AISCG_Activator {
             KEY scheduled_time (scheduled_time)
         ) $charset_collate;";
 
+        // 社交媒体分发表 (v1.6.0)
+        $table_distributions = $wpdb->prefix . 'aiscg_distributions';
+        $sql_distributions = "CREATE TABLE IF NOT EXISTS $table_distributions (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            post_id bigint(20) NOT NULL,
+            platform varchar(50) NOT NULL,
+            platform_post_id varchar(200),
+            status varchar(20) DEFAULT 'pending',
+            scheduled_time datetime,
+            published_at datetime,
+            error_message text,
+            metadata longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY post_id (post_id),
+            KEY platform (platform),
+            KEY status (status),
+            KEY scheduled_time (scheduled_time)
+        ) $charset_collate;";
+
+        // 内容表现数据表 (v1.6.0)
+        $table_performance = $wpdb->prefix . 'aiscg_performance';
+        $sql_performance = "CREATE TABLE IF NOT EXISTS $table_performance (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            post_id bigint(20) NOT NULL,
+            platform varchar(50) NOT NULL,
+            views int DEFAULT 0,
+            likes int DEFAULT 0,
+            comments int DEFAULT 0,
+            shares int DEFAULT 0,
+            saves int DEFAULT 0,
+            clicks int DEFAULT 0,
+            reach int DEFAULT 0,
+            impressions int DEFAULT 0,
+            engagement_rate decimal(5,2) DEFAULT 0,
+            new_followers int DEFAULT 0,
+            synced_at datetime,
+            metadata longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY post_id (post_id),
+            KEY platform (platform),
+            KEY synced_at (synced_at)
+        ) $charset_collate;";
+
+        // 内容日历事件表 (v1.6.0)
+        $table_calendar_events = $wpdb->prefix . 'aiscg_calendar_events';
+        $sql_calendar_events = "CREATE TABLE IF NOT EXISTS $table_calendar_events (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            title varchar(200) NOT NULL,
+            description text,
+            event_type varchar(50) DEFAULT 'content',
+            start_date datetime NOT NULL,
+            end_date datetime,
+            all_day tinyint(1) DEFAULT 0,
+            post_id bigint(20),
+            platform varchar(20),
+            color varchar(20),
+            recurrence_rule text,
+            metadata longtext,
+            user_id bigint(20),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY event_type (event_type),
+            KEY start_date (start_date),
+            KEY post_id (post_id),
+            KEY user_id (user_id)
+        ) $charset_collate;";
+
+        // 竞品信息表 (v1.7.0)
+        $table_competitors = $wpdb->prefix . 'aiscg_competitors';
+        $sql_competitors = "CREATE TABLE IF NOT EXISTS $table_competitors (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            name varchar(200) NOT NULL,
+            platform varchar(50) NOT NULL,
+            account_id varchar(200),
+            description text,
+            category varchar(100),
+            metadata longtext,
+            user_id bigint(20),
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY platform (platform),
+            KEY category (category),
+            KEY user_id (user_id)
+        ) $charset_collate;";
+
+        // 竞品分析报告表 (v1.7.0)
+        $table_competitor_reports = $wpdb->prefix . 'aiscg_competitor_reports';
+        $sql_competitor_reports = "CREATE TABLE IF NOT EXISTS $table_competitor_reports (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            competitor_id bigint(20) NOT NULL,
+            analysis_data longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY competitor_id (competitor_id),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+
+        // 合规检查记录表 (v1.7.0)
+        $table_compliance_records = $wpdb->prefix . 'aiscg_compliance_records';
+        $sql_compliance_records = "CREATE TABLE IF NOT EXISTS $table_compliance_records (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            content_id bigint(20),
+            compliance_score int DEFAULT 0,
+            can_publish tinyint(1) DEFAULT 1,
+            violations_count int DEFAULT 0,
+            warnings_count int DEFAULT 0,
+            check_data longtext,
+            checked_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY content_id (content_id),
+            KEY compliance_score (compliance_score),
+            KEY can_publish (can_publish),
+            KEY checked_at (checked_at)
+        ) $charset_collate;";
+
+        // 聊天机器人会话表 (v1.7.0)
+        $table_chatbot_sessions = $wpdb->prefix . 'aiscg_chatbot_sessions';
+        $sql_chatbot_sessions = "CREATE TABLE IF NOT EXISTS $table_chatbot_sessions (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            session_id varchar(100) NOT NULL,
+            user_id bigint(20),
+            bot_type varchar(50) DEFAULT 'general',
+            status varchar(20) DEFAULT 'active',
+            message_count int DEFAULT 0,
+            started_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            ended_at datetime,
+            PRIMARY KEY  (id),
+            UNIQUE KEY session_id (session_id),
+            KEY user_id (user_id),
+            KEY bot_type (bot_type),
+            KEY status (status)
+        ) $charset_collate;";
+
+        // 聊天机器人消息表 (v1.7.0)
+        $table_chatbot_messages = $wpdb->prefix . 'aiscg_chatbot_messages';
+        $sql_chatbot_messages = "CREATE TABLE IF NOT EXISTS $table_chatbot_messages (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            session_id varchar(100) NOT NULL,
+            role varchar(20) NOT NULL,
+            message text,
+            metadata longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY session_id (session_id),
+            KEY role (role),
+            KEY created_at (created_at)
+        ) $charset_collate;";
+
         // 执行SQL
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $sql_posts );
@@ -250,6 +405,16 @@ class AISCG_Activator {
         dbDelta( $sql_notifications );
         dbDelta( $sql_media_library );
         dbDelta( $sql_publishing_plans );
+        // v1.6.0 表
+        dbDelta( $sql_distributions );
+        dbDelta( $sql_performance );
+        dbDelta( $sql_calendar_events );
+        // v1.7.0 表
+        dbDelta( $sql_competitors );
+        dbDelta( $sql_competitor_reports );
+        dbDelta( $sql_compliance_records );
+        dbDelta( $sql_chatbot_sessions );
+        dbDelta( $sql_chatbot_messages );
 
         // 记录日志
         error_log( 'AISCG: Database tables created successfully' );

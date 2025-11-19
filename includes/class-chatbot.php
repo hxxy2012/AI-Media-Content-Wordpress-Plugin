@@ -57,7 +57,6 @@ class AISCG_Chatbot {
     public function __construct() {
         $this->ai_factory = new AISCG_AI_Service_Factory();
         $this->database = new AISCG_Database();
-        $this->create_chatbot_tables();
     }
 
     /**
