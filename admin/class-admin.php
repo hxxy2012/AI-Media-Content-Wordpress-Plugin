@@ -338,6 +338,34 @@ class AISCG_Admin {
             'callback' => array( $this, 'rest_get_chatbot_stats' ),
             'permission_callback' => array( $this, 'rest_permission_check' ),
         ) );
+
+        // 智能推荐 - 获取内容推荐
+        register_rest_route( 'aiscg/v1', '/intelligence/recommendations', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_get_content_recommendations' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 智能推荐 - 获取个性化内容建议
+        register_rest_route( 'aiscg/v1', '/intelligence/suggestions', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_get_content_suggestions' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 自动优化 - 优化单个内容
+        register_rest_route( 'aiscg/v1', '/optimize/content/(?P<id>\d+)', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_optimize_content' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
+
+        // 自动优化 - 批量优化
+        register_rest_route( 'aiscg/v1', '/optimize/batch', array(
+            'methods' => 'POST',
+            'callback' => array( $this, 'rest_batch_optimize' ),
+            'permission_callback' => array( $this, 'rest_permission_check' ),
+        ) );
     }
 
     /**
@@ -921,6 +949,101 @@ class AISCG_Admin {
         $stats = $chatbot->get_usage_stats( $user_id );
 
         return rest_ensure_response( $stats );
+    }
+
+    /**
+     * REST API: 获取内容推荐
+     */
+    public function rest_get_content_recommendations( $request ) {
+        $platform = sanitize_text_field( $request->get_param( 'platform' ) ) ?: 'xiaohongshu';
+        $category = sanitize_text_field( $request->get_param( 'category' ) );
+        $goal = sanitize_text_field( $request->get_param( 'goal' ) ) ?: 'engagement';
+        $use_ai = $request->get_param( 'use_ai' ) !== 'false';
+
+        $options = array(
+            'platform' => $platform,
+            'category' => $category,
+            'goal' => $goal,
+            'use_ai' => $use_ai,
+        );
+
+        $intelligence = new AISCG_Content_Intelligence();
+        $recommendations = $intelligence->get_content_recommendations( $options );
+
+        return rest_ensure_response( $recommendations );
+    }
+
+    /**
+     * REST API: 获取个性化内容建议
+     */
+    public function rest_get_content_suggestions( $request ) {
+        $topic = sanitize_text_field( $request->get_param( 'topic' ) );
+        $platform = sanitize_text_field( $request->get_param( 'platform' ) ) ?: 'xiaohongshu';
+        $style = sanitize_text_field( $request->get_param( 'style' ) ) ?: 'engaging';
+        $count = intval( $request->get_param( 'count' ) ) ?: 5;
+
+        if ( ! $topic ) {
+            return new WP_Error( 'missing_topic', '请提供主题', array( 'status' => 400 ) );
+        }
+
+        $options = array(
+            'platform' => $platform,
+            'style' => $style,
+            'count' => $count,
+        );
+
+        $intelligence = new AISCG_Content_Intelligence();
+        $suggestions = $intelligence->get_personalized_content_suggestions( $topic, $options );
+
+        return rest_ensure_response( $suggestions );
+    }
+
+    /**
+     * REST API: 优化内容
+     */
+    public function rest_optimize_content( $request ) {
+        $id = intval( $request->get_param( 'id' ) );
+        $fix_compliance = $request->get_param( 'fix_compliance' ) !== 'false';
+        $enhance_quality = $request->get_param( 'enhance_quality' ) !== 'false';
+        $optimize_seo = $request->get_param( 'optimize_seo' ) !== 'false';
+        $improve_readability = $request->get_param( 'improve_readability' ) !== 'false';
+
+        $options = array(
+            'fix_compliance' => $fix_compliance,
+            'enhance_quality' => $enhance_quality,
+            'optimize_seo' => $optimize_seo,
+            'improve_readability' => $improve_readability,
+        );
+
+        $optimizer = new AISCG_Auto_Optimizer();
+        $result = $optimizer->auto_optimize( $id, $options );
+
+        return rest_ensure_response( $result );
+    }
+
+    /**
+     * REST API: 批量优化
+     */
+    public function rest_batch_optimize( $request ) {
+        $content_ids = $request->get_param( 'content_ids' );
+
+        if ( ! is_array( $content_ids ) || empty( $content_ids ) ) {
+            return new WP_Error( 'invalid_ids', '请提供有效的内容ID列表', array( 'status' => 400 ) );
+        }
+
+        $content_ids = array_map( 'intval', $content_ids );
+
+        $options = array(
+            'fix_compliance' => $request->get_param( 'fix_compliance' ) !== 'false',
+            'enhance_quality' => $request->get_param( 'enhance_quality' ) !== 'false',
+            'optimize_seo' => $request->get_param( 'optimize_seo' ) !== 'false',
+            'improve_readability' => $request->get_param( 'improve_readability' ) !== 'false',
+        );
+
+        $optimizer = new AISCG_Auto_Optimizer();
+        $result = $optimizer->batch_optimize( $content_ids, $options );
+
+        return rest_ensure_response( $result );
     }
 
     /**

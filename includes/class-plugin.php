@@ -188,6 +188,12 @@ class AISCG_Plugin {
         // 智能问答机器人
         require_once AISCG_PLUGIN_DIR . 'includes/class-chatbot.php';
 
+        // 智能内容推荐系统
+        require_once AISCG_PLUGIN_DIR . 'includes/class-content-intelligence.php';
+
+        // 自动化内容优化引擎
+        require_once AISCG_PLUGIN_DIR . 'includes/class-auto-optimizer.php';
+
         // 管理员界面
         require_once AISCG_PLUGIN_DIR . 'admin/class-admin.php';
         require_once AISCG_PLUGIN_DIR . 'admin/class-settings.php';
